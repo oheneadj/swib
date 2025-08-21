@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Swib</title>
+
+  <!-- Tailwind + Preline -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/preline/dist/preline.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/preline/dist/preline.min.js"></script>
+
+</head>
+<body class="bg-gradient-to-r from-indigo-500 to-purple-600 min-h-screen flex items-center justify-center p-6">
+  <div class="max-w-5xl w-full">
+    <!-- Header -->
+    <div class="text-center text-white mb-10">
+      <h1 class="text-4xl font-bold">🚀 Swib</h1>
+      <p class="mt-2 text-lg opacity-90">Smart compression & conversion for the modern web</p>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 space-y-8">
+      <!-- Upload Section -->
+      <div class="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center cursor-pointer hover:border-indigo-500 transition" id="dropZone">
+        <p class="text-2xl mb-2">📁 Drop your images here</p>
+        <p class="text-gray-600">or click to select files • JPG, PNG, WebP • Max 10MB each</p>
+        <button class="hs-btn hs-btn-primary mt-4" onclick="document.getElementById('fileInput').click()">Select Images</button>
+        <input type="file" id="fileInput" class="hidden" multiple accept="image/jpeg,image/png,image/webp">
+      </div>
+
+      <!-- Options -->
+      <div class="grid md:grid-cols-3 gap-6">
+        <div>
+          <h4 class="font-semibold mb-2">📋 Output Formats</h4>
+          <div class="flex flex-wrap gap-2">
+            <label><input type="checkbox" id="formatWebp" class="mr-1" checked> WebP</label>
+            <label><input type="checkbox" id="formatAvif" class="mr-1"> AVIF</label>
+            <label><input type="checkbox" id="formatJpeg" class="mr-1"> JPEG</label>
+            <label><input type="checkbox" id="formatPng" class="mr-1"> PNG</label>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-2">⚡ Quality: <span id="qualityValue">80</span>%</h4>
+          <input type="range" id="qualitySlider" class="w-full" min="10" max="100" value="80">
+          <p class="text-sm text-gray-500 mt-1">Higher quality = larger file size</p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-2">🔧 Advanced Options</h4>
+          <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="losslessMode"> Lossless compression</label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="progressiveJpeg" checked> Progressive JPEG</label>
+        </div>
+      </div>
+
+      <!-- Compress Button -->
+      <div class="text-center">
+        <button class="hs-btn hs-btn-gradient w-full md:w-auto px-8 py-3" id="compressBtn" disabled>
+          <span id="compressText">Select images to continue</span>
+          <span id="compressLoading" class="hidden ml-2 animate-spin border-2 border-t-transparent border-white rounded-full w-5 h-5"></span>
+        </button>
+      </div>
+
+      <!-- Files List -->
+      <div id="filesSection" class="hidden">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold" id="filesTitle">Processed Images</h3>
+          <button class="hs-btn hs-btn-soft-info hidden" id="downloadAllBtn">📦 Download All as ZIP</button>
+        </div>
+        <div id="filesList" class="space-y-4"></div>
+      </div>
+
+      <!-- Stats -->
+      <div id="statsSection" class="hidden bg-gradient-to-r from-green-500 to-emerald-400 text-white p-6 rounded-xl">
+        <h3 class="text-xl font-semibold text-center mb-4">📊 Compression Results</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div><p class="text-2xl font-bold" id="totalFiles">0</p><span>Files Processed</span></div>
+          <div><p class="text-2xl font-bold" id="originalSize">0 MB</p><span>Original Size</span></div>
+          <div><p class="text-2xl font-bold" id="compressedSize">0 MB</p><span>Compressed Size</span></div>
+          <div><p class="text-2xl font-bold" id="totalSavings">0%</p><span>Space Saved</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSZip -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+  class ImageOptimizer {
+    constructor() {
+      this.files = [];
+      this.processedResults = [];
+      this.initEvents();
+      this.updateQuality();
+    }
+
+    initEvents() {
+      const dropZone = document.getElementById("dropZone");
+      const fileInput = document.getElementById("fileInput");
+      const qualitySlider = document.getElementById("qualitySlider");
+      const compressBtn = document.getElementById("compressBtn");
+      const downloadAllBtn = document.getElementById("downloadAllBtn");
+
+      dropZone.addEventListener("click", () => fileInput.click());
+      dropZone.addEventListener("dragover", e => {e.preventDefault(); dropZone.classList.add("border-indigo-500");});
+      dropZone.addEventListener("dragleave", e => {e.preventDefault(); dropZone.classList.remove("border-indigo-500");});
+      dropZone.addEventListener("drop", e => {e.preventDefault(); dropZone.classList.remove("border-indigo-500"); this.addFiles(Array.from(e.dataTransfer.files));});
+      fileInput.addEventListener("change", e => this.addFiles(Array.from(e.target.files)));
+      qualitySlider.addEventListener("input", () => this.updateQuality());
+      compressBtn.addEventListener("click", () => this.compressImages());
+      downloadAllBtn.addEventListener("click", () => this.downloadAllAsZip());
+    }
+
+    updateQuality() {
+      document.getElementById("qualityValue").textContent = document.getElementById("qualitySlider").value;
+    }
+
+    addFiles(newFiles) {
+      const valid = newFiles.filter(f => ["image/jpeg","image/png","image/webp"].includes(f.type) && f.size <= 10*1024*1024);
+      this.files = [...this.files, ...valid];
+      this.updateFileDisplay();
+      this.updateCompressButton();
+    }
+
+    updateFileDisplay() {
+      const filesSection = document.getElementById("filesSection");
+      const filesList = document.getElementById("filesList");
+      if (this.files.length === 0) { filesSection.classList.add("hidden"); return; }
+      filesSection.classList.remove("hidden");
+      filesList.innerHTML = "";
+      this.files.forEach((f,i) => filesList.appendChild(this.createFileCard(f,i)));
+      document.getElementById("filesTitle").textContent = `Selected Images (${this.files.length})`;
+    }
+
+    createFileCard(file,index) {
+      const card = document.createElement("div");
+      card.className = "flex items-center gap-4 bg-white border rounded-lg p-4 shadow-sm";
+
+      const preview = document.createElement("img");
+      preview.className = "w-16 h-16 object-cover rounded";
+      const reader = new FileReader();
+      reader.onload = e => preview.src = e.target.result;
+      reader.readAsDataURL(file);
+
+      const info = document.createElement("div");
+      info.className = "flex-1";
+      info.innerHTML = `<p class="font-medium">${file.name}</p><p class="text-sm text-gray-500">${this.formatSize(file.size)}</p><div class="h-2 bg-gray-200 rounded mt-2"><div class="h-2 bg-green-500 rounded w-0" id="progress-${index}"></div></div><div id="versions-${index}" class="mt-2 space-y-1"></div>`;
+
+      card.appendChild(preview);
+      card.appendChild(info);
+      return card;
+    }
+
+    updateCompressButton() {
+      const btn = document.getElementById("compressBtn");
+      const txt = document.getElementById("compressText");
+      if (this.files.length === 0) {btn.disabled=true; txt.textContent="Select images to continue"; return;}
+      const formats = this.getFormats();
+      if (formats.length===0){btn.disabled=true; txt.textContent="Select at least one output format"; return;}
+      btn.disabled=false;
+      txt.textContent=`Compress ${this.files.length} file(s) → ${formats.length} format(s)`;
+    }
+
+    getFormats() {
+      const f=[]; if(document.getElementById("formatWebp").checked) f.push("webp");
+      if(document.getElementById("formatAvif").checked) f.push("avif");
+      if(document.getElementById("formatJpeg").checked) f.push("jpeg");
+      if(document.getElementById("formatPng").checked) f.push("png");
+      return f;
+    }
+
+    async compressImages() {
+      const btn=document.getElementById("compressBtn");
+      const txt=document.getElementById("compressText");
+      const loading=document.getElementById("compressLoading");
+      btn.disabled=true; txt.textContent="Compressing..."; loading.classList.remove("hidden");
+      this.processedResults=[];
+
+      const formats=this.getFormats();
+      const quality=parseInt(document.getElementById("qualitySlider").value);
+      const lossless=document.getElementById("losslessMode").checked;
+
+      for (let i=0;i<this.files.length;i++){
+        const file=this.files[i];
+        for (let j=0;j<formats.length;j++){
+          const result=await this.processFile(file,formats[j],{quality,lossless});
+          this.processedResults.push(result);
+          this.addVersion(i,result);
+          document.getElementById(`progress-${i}`).style.width=`${((j+1)/formats.length)*100}%`;
+        }
+      }
+
+      this.updateStats();
+      document.getElementById("downloadAllBtn").classList.remove("hidden");
+      txt.textContent="✅ Compression Complete!";
+      loading.classList.add("hidden");
+      setTimeout(()=>this.updateCompressButton(),2000);
+    }
+
+    processFile(file,format,options){
+      return new Promise(resolve=>{
+        const canvas=document.createElement("canvas");
+        const ctx=canvas.getContext("2d");
+        const img=new Image();
+        img.onload=()=>{
+          canvas.width=img.width; canvas.height=img.height;
+          ctx.drawImage(img,0,0);
+          const mime=this.getMime(format);
+          const q=options.lossless?1.0:options.quality/100;
+          canvas.toBlob(blob=>{
+            const compressedSize=blob.size;
+            const savings=((1-compressedSize/file.size)*100).toFixed(1);
+            resolve({originalFile:file,format,blob,originalSize:file.size,compressedSize,savings,filename:this.getName(file.name,format)});
+          },mime,q);
+        };
+        const reader=new FileReader();
+        reader.onload=e=>img.src=e.target.result;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    getMime(f){return {webp:"image/webp",avif:"image/avif",jpeg:"image/jpeg",png:"image/png"}[f]||"image/jpeg";}
+    getName(name,f){return name.replace(/\.[^/.]+$/,"")+"."+f;}
+    formatSize(b){if(b===0)return"0 B";const k=1024;const s=["B","KB","MB"];const i=Math.floor(Math.log(b)/Math.log(k));return (b/Math.pow(k,i)).toFixed(1)+" "+s[i];}
+
+    addVersion(i,res){
+      const div=document.createElement("div");
+      div.className="flex justify-between items-center text-sm bg-gray-50 p-2 rounded";
+      div.innerHTML=`<span class="font-medium">${res.format.toUpperCase()}</span><span>${this.formatSize(res.compressedSize)} (−${res.savings}%)</span><button class="hs-btn hs-btn-soft-primary text-xs" onclick="optimizer.downloadFile('${res.filename}',${this.processedResults.length-1})">Download</button>`;
+      document.getElementById(`versions-${i}`).appendChild(div);
+    }
+
+    downloadFile(name,idx){
+      const r=this.processedResults[idx];const url=URL.createObjectURL(r.blob);
+      const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+    }
+
+    async downloadAllAsZip(){
+      const zip=new JSZip();this.processedResults.forEach(r=>zip.file(r.filename,r.blob));
+      const content=await zip.generateAsync({type:"blob"});
+      const url=URL.createObjectURL(content);
+      const a=document.createElement("a");a.href=url;a.download=`compressed-images-${Date.now()}.zip`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+    }
+
+    updateStats(){
+      const sec=document.getElementById("statsSection");
+      if(this.processedResults.length===0){sec.classList.add("hidden");return;}
+      sec.classList.remove("hidden");
+      const totalOrig=this.processedResults.reduce((s,r)=>s+r.originalSize,0);
+      const totalComp=this.processedResults.reduce((s,r)=>s+r.compressedSize,0);
+      const totalSav=((1-totalComp/totalOrig)*100).toFixed(1);
+      document.getElementById("totalFiles").textContent=this.files.length;
+      document.getElementById("originalSize").textContent=this.formatSize(totalOrig);
+      document.getElementById("compressedSize").textContent=this.formatSize(totalComp);
+      document.getElementById("totalSavings").textContent=totalSav+"%";
+    }
+  }
+
+  const optimizer=new ImageOptimizer();
+  </script>
+</body>
+</html>
