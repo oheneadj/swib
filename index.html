@@ -1,263 +1,658 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Swib</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swib — Smart Image Optimizer</title>
 
-  <!-- Tailwind + Preline -->
+  <!-- Tailwind + Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/preline/dist/preline.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/preline/dist/preline.min.js"></script>
 
-</head>
-<body class="bg-gradient-to-r from-indigo-500 to-purple-600 min-h-screen flex items-center justify-center p-6">
-  <div class="max-w-5xl w-full">
-    <!-- Header -->
-    <div class="text-center text-white mb-10">
-      <h1 class="text-4xl font-bold">🚀 Swib</h1>
-      <p class="mt-2 text-lg opacity-90">Smart compression & conversion for the modern web</p>
-    </div>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    <!-- Main Card -->
-    <div class="bg-white rounded-2xl shadow-lg p-6 space-y-8">
-      <!-- Upload Section -->
-      <div class="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center cursor-pointer hover:border-indigo-500 transition" id="dropZone">
-        <p class="text-2xl mb-2">📁 Drop your images here</p>
-        <p class="text-gray-600">or click to select files • JPG, PNG, WebP • Max 10MB each</p>
-        <button class="hs-btn hs-btn-primary mt-4" onclick="document.getElementById('fileInput').click()">Select Images</button>
-        <input type="file" id="fileInput" class="hidden" multiple accept="image/jpeg,image/png,image/webp">
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #e2e8f0;
+      border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #cbd5e1;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+
+<body
+  class="bg-[#F8FAFC] min-h-screen text-gray-900 p-6 md:p-10 font-sans selection:bg-blue-100 selection:text-blue-600 overflow-x-hidden">
+
+  <div class="flex flex-col md:flex-row max-w-[1600px] mx-auto gap-6 transition-all">
+    <!-- Left Sidebar -->
+    <aside
+      class="w-full md:w-64 bg-white rounded-[32px] shadow-sm border border-gray-100 flex flex-col h-fit md:sticky md:top-10 shrink-0 animate-in fade-in slide-in-from-left-4 duration-500">
+      <div class="p-8 flex items-center gap-3">
+        <div class="bg-blue-600 p-2 rounded-xl text-white">
+          <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
+        </div>
+        <span class="text-lg font-bold tracking-tight text-gray-900">Fast Convert</span>
       </div>
 
-      <!-- Options -->
-      <div class="grid md:grid-cols-3 gap-6">
-        <div>
-          <h4 class="font-semibold mb-2">📋 Output Formats</h4>
-          <div class="flex flex-wrap gap-2">
-            <label><input type="checkbox" id="formatWebp" class="mr-1" checked> WebP</label>
-            <label><input type="checkbox" id="formatAvif" class="mr-1"> AVIF</label>
-            <label><input type="checkbox" id="formatJpeg" class="mr-1"> JPEG</label>
-            <label><input type="checkbox" id="formatPng" class="mr-1"> PNG</label>
+      <nav class="flex-1 px-5 py-2 space-y-1">
+        <a href="#"
+          class="flex items-center gap-3 px-4 py-3 text-blue-600 bg-blue-50 rounded-2xl font-semibold group transition-all">
+          <i data-lucide="layout-grid" class="w-5 h-5"></i>
+          <span>Home</span>
+        </a>
+        <a href="#"
+          class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-2xl group transition-all">
+          <i data-lucide="files" class="w-5 h-5 group-hover:text-gray-600"></i>
+          <span>All files</span>
+        </a>
+        <a href="#"
+          class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-2xl group transition-all">
+          <i data-lucide="share-2" class="w-5 h-5 group-hover:text-gray-600"></i>
+          <span>Shared by you</span>
+        </a>
+        <a href="#"
+          class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-2xl group transition-all">
+          <i data-lucide="users" class="w-5 h-5 group-hover:text-gray-600"></i>
+          <span>Shared with you</span>
+        </a>
+        <a href="#"
+          class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-2xl group transition-all">
+          <i data-lucide="settings" class="w-5 h-5 group-hover:text-gray-600"></i>
+          <span>Settings</span>
+        </a>
+        <a href="#"
+          class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-2xl group transition-all">
+          <i data-lucide="help-circle" class="w-5 h-5 group-hover:text-gray-600"></i>
+          <span>Support Center</span>
+        </a>
+        <a href="#"
+          class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-2xl group transition-all">
+          <i data-lucide="log-out" class="w-5 h-5 group-hover:text-red-500"></i>
+          <span>Log out</span>
+        </a>
+      </nav>
+
+      <div class="px-6 py-8">
+        <div class="bg-gray-50 border border-gray-100 p-6 rounded-[32px] flex flex-col items-center text-center">
+          <img src="https://i.pravatar.cc/100?u=thea" class="w-12 h-12 rounded-full mb-3" alt="Avatar">
+          <p class="font-bold text-gray-900 text-sm">Thea Murray</p>
+          <p class="text-gray-400 text-[10px] mb-4">murray86@gmail.com</p>
+          <p class="text-[10px] text-gray-400 font-bold mb-3 uppercase tracking-wide">5/20 free conversions</p>
+          <button
+            class="w-full bg-[#1A1A1A] text-white py-3 rounded-2xl text-xs font-bold hover:bg-black transition-all">Upgrade
+            now</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Card -->
+    <main class="flex-1 min-w-0">
+      <div class="space-y-8">
+        <!-- Dashboard Header -->
+        <header class="flex justify-between items-center px-2">
+          <h1 class="text-xl font-bold text-gray-900">Convert JPG to PDF</h1>
+          <button
+            class="w-10 h-10 flex items-center justify-center text-gray-400 hover:bg-white hover:shadow-sm rounded-xl transition-all">
+            <i data-lucide="more-horizontal" class="w-6 h-6"></i>
+          </button>
+        </header>
+
+        <!-- Drop Zone Section -->
+        <div
+          class="bg-[#F0F5FF] border-2 border-dashed border-blue-200 rounded-[32px] p-16 text-center relative group transition-all hover:border-blue-400"
+          id="dropZone"
+          style="background-image: radial-gradient(circle at center, rgba(30, 77, 255, 0.03) 0%, transparent 70%);">
+          <input type="file" id="fileInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" multiple
+            accept="image/jpeg,image/png,image/webp">
+          <div class="space-y-4">
+            <div
+              class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto text-blue-600">
+              <i data-lucide="upload-cloud" class="w-7 h-7"></i>
+            </div>
+            <p class="text-base font-bold text-gray-800">Click or drag your files here to convert</p>
           </div>
         </div>
 
-        <div>
-          <h4 class="font-semibold mb-2">⚡ Quality: <span id="qualityValue">80</span>%</h4>
-          <input type="range" id="qualitySlider" class="w-full" min="10" max="100" value="80">
-          <p class="text-sm text-gray-500 mt-1">Higher quality = larger file size</p>
+        <!-- Conversion Settings Card -->
+        <div class="bg-white rounded-[32px] border border-gray-100 p-8 shadow-sm space-y-10">
+          <div class="flex items-center justify-between">
+            <label class="inline-flex items-center cursor-pointer group">
+              <div class="relative">
+                <input type="checkbox" id="autoConvertToggle" class="sr-only peer">
+                <div
+                  class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
+                </div>
+              </div>
+              <span class="ms-4 text-sm font-bold text-gray-700">Convert my images automatically</span>
+            </label>
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="zap" class="w-3.5 h-3.5 text-blue-600"></i>
+              <span class="text-xs font-bold text-gray-900">Quality: <span id="qualityValue"
+                  class="text-blue-600">80%</span></span>
+            </div>
+          </div>
+
+          <div class="border-t border-gray-50 pt-8">
+            <div class="flex flex-wrap items-center gap-3">
+              <button
+                class="format-pill px-6 py-2 rounded-full border border-gray-200 text-[11px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all uppercase tracking-wider"
+                data-format="avif">AVIF</button>
+              <button
+                class="format-pill px-6 py-2 rounded-full border border-gray-200 text-[11px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all uppercase tracking-wider"
+                data-format="jpeg">JPEG</button>
+              <button
+                class="format-pill px-6 py-2 rounded-full border border-gray-200 text-[11px] font-bold text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-all uppercase tracking-wider"
+                data-format="png">PNG</button>
+              <button
+                class="format-pill active px-6 py-2 rounded-full border border-blue-600 bg-white text-[11px] font-bold text-blue-600 transition-all uppercase tracking-wider"
+                data-format="webp">WEBP</button>
+              <div class="h-6 w-px bg-gray-100 mx-2"></div>
+              <button id="selectAllFormats"
+                class="px-6 py-2 rounded-full border border-gray-200 text-[11px] font-bold text-gray-600 hover:bg-gray-50 transition-all uppercase tracking-wider">Select
+                All</button>
+            </div>
+          </div>
+
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 border-t border-gray-50 pt-8">
+            <div class="flex-1 max-w-xs">
+              <input type="range" id="qualitySlider"
+                class="w-full h-1 bg-gray-100 rounded-full appearance-none cursor-pointer accent-blue-600" min="10"
+                max="100" value="80">
+            </div>
+
+            <button
+              class="bg-[#1A1A1A] text-white px-10 py-4 rounded-2xl text-xs font-bold hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+              id="compressBtn" disabled>
+              <span id="compressText">Optimize images</span>
+              <span id="compressLoading"
+                class="hidden animate-spin border-2 border-t-transparent border-white rounded-full w-4 h-4"></span>
+            </button>
+          </div>
         </div>
 
-        <div>
-          <h4 class="font-semibold mb-2">🔧 Advanced Options</h4>
-          <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="losslessMode"> Lossless compression</label>
-          <label class="flex items-center gap-2"><input type="checkbox" id="progressiveJpeg" checked> Progressive JPEG</label>
+        <!-- Processed Files Section -->
+        <div id="filesSection" class="hidden space-y-6">
+          <!-- Dark Summary Bar -->
+          <div id="summaryBar"
+            class="bg-[#2D2E35] text-white rounded-[32px] p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+            <div class="space-y-1">
+              <h2 class="text-2xl font-bold text-[#87C639]" id="summaryTitle">Optimizing...</h2>
+              <div class="flex items-center gap-3 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                <span id="summaryStats">0 images optimized | 0 MB TOTAL</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <button
+                  class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all">
+                  <i data-lucide="share-2" class="w-4 h-4"></i>
+                </button>
+                <button
+                  class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all">
+                  <i data-lucide="twitter" class="w-4 h-4 text-white"></i>
+                </button>
+              </div>
+              <button
+                class="bg-[ text-white px-8 py-3.5 rounded-2xl text-xs font-bold hover:brightness-110 transition-all flex items-center gap-2 shadow-lg shadow-[#87C639]/20"
+                id="downloadAllBtnTop">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                Download all images
+              </button>
+            </div>
+          </div>
+
+          <div id="filesList" class="space-y-4">
+            <!-- Cards dynamically inserted here -->
+          </div>
+        </div>
+
+        <!-- Recommended Tools Section -->
+        <div class="pt-8 mt-12 border-t border-gray-100">
+          <div class="flex justify-between items-center mb-8 px-2">
+            <h3 class="text-xl font-bold text-gray-900">Recommended tools</h3>
+            <a href="#" class="text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors">View all</a>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              class="p-4 bg-white border border-gray-100 rounded-[28px] flex items-center gap-4 hover:shadow-sm transition-all cursor-pointer group">
+              <div class="bg-gray-50 p-3 rounded-2xl text-blue-600">
+                <i data-lucide="file-type-2" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <p class="font-bold text-gray-900 text-sm">JPG to PDF</p>
+                <p class="text-[10px] text-gray-400 font-medium">Convert any JPG files to PDF format</p>
+              </div>
+              <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                <i data-lucide="arrow-right" class="w-4 h-4 text-gray-300"></i>
+              </div>
+            </div>
+            <div
+              class="p-4 bg-white border border-gray-100 rounded-[28px] flex items-center gap-4 hover:shadow-sm transition-all cursor-pointer group">
+              <div class="bg-gray-50 p-3 rounded-2xl text-blue-600">
+                <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <p class="font-bold text-gray-900 text-sm">DOC to XLS</p>
+                <p class="text-[10px] text-gray-400 font-medium">Convert any DOC files to XLS format</p>
+              </div>
+              <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                <i data-lucide="arrow-right" class="w-4 h-4 text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <div
+      class="w-full md:w-80 flex flex-col gap-6 shrink-0 h-fit md:sticky md:top-10 animate-in fade-in slide-in-from-right-4 duration-500 delay-150">
+      <!-- AI Converter Card -->
+      <div
+        class="rounded-[32px] bg-gradient-to-br from-[#1E4DFF] to-[#0D247E] p-8 text-white relative overflow-hidden group shadow-xl">
+        <div class="relative z-10">
+          <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-bold mb-6">New
+            feature</span>
+          <h4 class="text-2xl font-bold mb-3">AI Converter</h4>
+          <p class="text-xs text-blue-100/80 mb-8 leading-relaxed">Vectorize your images with AI. Extract layers from
+            PDF.</p>
+          <button
+            class="w-full bg-white text-blue-600 py-3.5 rounded-2xl font-bold text-xs hover:scale-[1.02] active:scale-95 transition-all">Try
+            Now</button>
         </div>
       </div>
 
-      <!-- Compress Button -->
-      <div class="text-center">
-        <button class="hs-btn hs-btn-gradient w-full md:w-auto px-8 py-3" id="compressBtn" disabled>
-          <span id="compressText">Select images to continue</span>
-          <span id="compressLoading" class="hidden ml-2 animate-spin border-2 border-t-transparent border-white rounded-full w-5 h-5"></span>
-        </button>
-      </div>
-
-      <!-- Files List -->
-      <div id="filesSection" class="hidden">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold" id="filesTitle">Processed Images</h3>
-          <button class="hs-btn hs-btn-soft-info hidden" id="downloadAllBtn">📦 Download All as ZIP</button>
+      <!-- History Card -->
+      <div class="bg-white rounded-[32px] shadow-sm border border-gray-100 p-8 flex flex-col min-h-[400px]">
+        <div class="flex justify-between items-center mb-8">
+          <h3 class="text-xl font-bold text-gray-900">History</h3>
+          <button class="p-2 text-gray-300 hover:bg-gray-50 rounded-xl transition-all"><i data-lucide="more-horizontal"
+              class="w-5 h-5"></i></button>
         </div>
-        <div id="filesList" class="space-y-4"></div>
-      </div>
 
-      <!-- Stats -->
-      <div id="statsSection" class="hidden bg-gradient-to-r from-green-500 to-emerald-400 text-white p-6 rounded-xl">
-        <h3 class="text-xl font-semibold text-center mb-4">📊 Compression Results</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div><p class="text-2xl font-bold" id="totalFiles">0</p><span>Files Processed</span></div>
-          <div><p class="text-2xl font-bold" id="originalSize">0 MB</p><span>Original Size</span></div>
-          <div><p class="text-2xl font-bold" id="compressedSize">0 MB</p><span>Compressed Size</span></div>
-          <div><p class="text-2xl font-bold" id="totalSavings">0%</p><span>Space Saved</span></div>
+        <div class="space-y-4 flex-1" id="historyList">
+          <!-- History items dynamically inserted -->
+          <div class="empty-state text-center py-10">
+            <div class="bg-gray-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto text-gray-300 mb-4">
+              <i data-lucide="clock" class="w-8 h-8"></i>
+            </div>
+            <p class="text-gray-400 text-sm font-bold">No recent activity</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
+
   <!-- JSZip -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script>
-  class ImageOptimizer {
-    constructor() {
-      this.files = [];
-      this.processedResults = [];
-      this.initEvents();
-      this.updateQuality();
-    }
+    // Initialize Lucide Icons
+    lucide.createIcons();
 
-    initEvents() {
-      const dropZone = document.getElementById("dropZone");
-      const fileInput = document.getElementById("fileInput");
-      const qualitySlider = document.getElementById("qualitySlider");
-      const compressBtn = document.getElementById("compressBtn");
-      const downloadAllBtn = document.getElementById("downloadAllBtn");
+    class ImageOptimizer {
+      constructor() {
+        this.files = [];
+        this.processedResults = [];
+        this.isConverting = false;
+        this.initEvents();
+        this.updateQuality();
+      }
 
-      dropZone.addEventListener("click", () => fileInput.click());
-      dropZone.addEventListener("dragover", e => {e.preventDefault(); dropZone.classList.add("border-indigo-500");});
-      dropZone.addEventListener("dragleave", e => {e.preventDefault(); dropZone.classList.remove("border-indigo-500");});
-      dropZone.addEventListener("drop", e => {e.preventDefault(); dropZone.classList.remove("border-indigo-500"); this.addFiles(Array.from(e.dataTransfer.files));});
-      fileInput.addEventListener("change", e => this.addFiles(Array.from(e.target.files)));
-      qualitySlider.addEventListener("input", () => this.updateQuality());
-      compressBtn.addEventListener("click", () => this.compressImages());
-      downloadAllBtn.addEventListener("click", () => this.downloadAllAsZip());
-    }
+      initEvents() {
+        const dropZone = document.getElementById("dropZone");
+        const fileInput = document.getElementById("fileInput");
+        const qualitySlider = document.getElementById("qualitySlider");
+        const compressBtn = document.getElementById("compressBtn");
+        const downloadAllBtn = document.getElementById("downloadAllBtn");
+        const downloadAllBtnTop = document.getElementById("downloadAllBtnTop");
 
-    updateQuality() {
-      document.getElementById("qualityValue").textContent = document.getElementById("qualitySlider").value;
-    }
+        if (dropZone) {
+          dropZone.addEventListener("dragover", e => {
+            e.preventDefault();
+            dropZone.classList.add("bg-gray-50", "border-blue-400");
+          });
+          dropZone.addEventListener("dragleave", e => {
+            e.preventDefault();
+            dropZone.classList.remove("bg-gray-50", "border-blue-400");
+          });
+          dropZone.addEventListener("drop", e => {
+            e.preventDefault();
+            dropZone.classList.remove("bg-gray-50", "border-blue-400");
+            this.addFiles(Array.from(e.dataTransfer.files));
+          });
+        }
 
-    addFiles(newFiles) {
-      const valid = newFiles.filter(f => ["image/jpeg","image/png","image/webp"].includes(f.type) && f.size <= 10*1024*1024);
-      this.files = [...this.files, ...valid];
-      this.updateFileDisplay();
-      this.updateCompressButton();
-    }
+        if (fileInput) {
+          fileInput.addEventListener("change", e => this.addFiles(Array.from(e.target.files)));
+        }
+        if (qualitySlider) {
+          qualitySlider.addEventListener("input", () => this.updateQuality());
+        }
+        if (compressBtn) {
+          compressBtn.addEventListener("click", () => this.compressImages());
+        }
+        if (downloadAllBtn) {
+          downloadAllBtn.addEventListener("click", () => this.downloadAllAsZip());
+        }
+        if (downloadAllBtnTop) {
+          downloadAllBtnTop.addEventListener("click", () => this.downloadAllAsZip());
+        }
 
-    updateFileDisplay() {
-      const filesSection = document.getElementById("filesSection");
-      const filesList = document.getElementById("filesList");
-      if (this.files.length === 0) { filesSection.classList.add("hidden"); return; }
-      filesSection.classList.remove("hidden");
-      filesList.innerHTML = "";
-      this.files.forEach((f,i) => filesList.appendChild(this.createFileCard(f,i)));
-      document.getElementById("filesTitle").textContent = `Selected Images (${this.files.length})`;
-    }
+        // Format pill events
+        document.querySelectorAll(".format-pill").forEach(pill => {
+          pill.addEventListener("click", () => {
+            pill.classList.toggle("active");
+            if (pill.classList.contains("active")) {
+              pill.classList.remove("border-gray-200", "text-gray-600");
+              pill.classList.add("border-blue-600", "bg-white", "text-blue-600");
+            } else {
+              pill.classList.remove("border-blue-600", "bg-white", "text-blue-600");
+              pill.classList.add("border-gray-200", "text-gray-600");
+            }
+            this.updateCompressButton();
+          });
+        });
 
-    createFileCard(file,index) {
-      const card = document.createElement("div");
-      card.className = "flex items-center gap-4 bg-white border rounded-lg p-4 shadow-sm";
-
-      const preview = document.createElement("img");
-      preview.className = "w-16 h-16 object-cover rounded";
-      const reader = new FileReader();
-      reader.onload = e => preview.src = e.target.result;
-      reader.readAsDataURL(file);
-
-      const info = document.createElement("div");
-      info.className = "flex-1";
-      info.innerHTML = `<p class="font-medium">${file.name}</p><p class="text-sm text-gray-500">${this.formatSize(file.size)}</p><div class="h-2 bg-gray-200 rounded mt-2"><div class="h-2 bg-green-500 rounded w-0" id="progress-${index}"></div></div><div id="versions-${index}" class="mt-2 space-y-1"></div>`;
-
-      card.appendChild(preview);
-      card.appendChild(info);
-      return card;
-    }
-
-    updateCompressButton() {
-      const btn = document.getElementById("compressBtn");
-      const txt = document.getElementById("compressText");
-      if (this.files.length === 0) {btn.disabled=true; txt.textContent="Select images to continue"; return;}
-      const formats = this.getFormats();
-      if (formats.length===0){btn.disabled=true; txt.textContent="Select at least one output format"; return;}
-      btn.disabled=false;
-      txt.textContent=`Compress ${this.files.length} file(s) → ${formats.length} format(s)`;
-    }
-
-    getFormats() {
-      const f=[]; if(document.getElementById("formatWebp").checked) f.push("webp");
-      if(document.getElementById("formatAvif").checked) f.push("avif");
-      if(document.getElementById("formatJpeg").checked) f.push("jpeg");
-      if(document.getElementById("formatPng").checked) f.push("png");
-      return f;
-    }
-
-    async compressImages() {
-      const btn=document.getElementById("compressBtn");
-      const txt=document.getElementById("compressText");
-      const loading=document.getElementById("compressLoading");
-      btn.disabled=true; txt.textContent="Compressing..."; loading.classList.remove("hidden");
-      this.processedResults=[];
-
-      const formats=this.getFormats();
-      const quality=parseInt(document.getElementById("qualitySlider").value);
-      const lossless=document.getElementById("losslessMode").checked;
-
-      for (let i=0;i<this.files.length;i++){
-        const file=this.files[i];
-        for (let j=0;j<formats.length;j++){
-          const result=await this.processFile(file,formats[j],{quality,lossless});
-          this.processedResults.push(result);
-          this.addVersion(i,result);
-          document.getElementById(`progress-${i}`).style.width=`${((j+1)/formats.length)*100}%`;
+        const selectAllBtn = document.getElementById("selectAllFormats");
+        if (selectAllBtn) {
+          selectAllBtn.addEventListener("click", () => {
+            const pills = document.querySelectorAll(".format-pill");
+            const allActive = Array.from(pills).every(p => p.classList.contains("active"));
+            pills.forEach(pill => {
+              if (allActive) {
+                pill.classList.remove("active", "border-blue-600", "bg-white", "text-blue-600");
+                pill.classList.add("border-gray-200", "text-gray-600");
+              } else {
+                pill.classList.add("active", "border-blue-600", "bg-white", "text-blue-600");
+                pill.classList.remove("border-gray-200", "text-gray-600");
+              }
+            });
+            this.updateCompressButton();
+          });
         }
       }
 
-      this.updateStats();
-      document.getElementById("downloadAllBtn").classList.remove("hidden");
-      txt.textContent="✅ Compression Complete!";
-      loading.classList.add("hidden");
-      setTimeout(()=>this.updateCompressButton(),2000);
-    }
+      updateQuality() {
+        document.getElementById("qualityValue").textContent = document.getElementById("qualitySlider").value + "%";
+      }
 
-    processFile(file,format,options){
-      return new Promise(resolve=>{
-        const canvas=document.createElement("canvas");
-        const ctx=canvas.getContext("2d");
-        const img=new Image();
-        img.onload=()=>{
-          canvas.width=img.width; canvas.height=img.height;
-          ctx.drawImage(img,0,0);
-          const mime=this.getMime(format);
-          const q=options.lossless?1.0:options.quality/100;
-          canvas.toBlob(blob=>{
-            const compressedSize=blob.size;
-            const savings=((1-compressedSize/file.size)*100).toFixed(1);
-            resolve({originalFile:file,format,blob,originalSize:file.size,compressedSize,savings,filename:this.getName(file.name,format)});
-          },mime,q);
+      addFiles(newFiles) {
+        const valid = newFiles.filter(f => ["image/jpeg", "image/png", "image/webp"].includes(f.type) && f.size <= 10 * 1024 * 1024);
+        this.files = [...this.files, ...valid];
+        this.updateFileDisplay();
+        this.updateCompressButton();
+
+        const autoConvert = document.getElementById("autoConvertToggle").checked;
+        if (autoConvert && this.files.length > 0) {
+          this.compressImages();
+        }
+      }
+
+      updateFileDisplay() {
+        const filesSection = document.getElementById("filesSection");
+        const filesList = document.getElementById("filesList");
+        if (this.files.length === 0) {
+          filesSection.classList.add("hidden");
+          return;
+        }
+        filesSection.classList.remove("hidden");
+        filesList.innerHTML = "";
+        const formats = this.getFormats();
+        this.files.forEach((f, i) => filesList.appendChild(this.createFileCard(f, i, formats)));
+        lucide.createIcons();
+      }
+
+      createFileCard(file, index, formats) {
+        const row = document.createElement("div");
+        row.className = "bg-white border border-gray-100 rounded-[32px] p-6 flex items-center gap-8 transition-all hover:shadow-sm";
+
+        const iconContainer = document.createElement("div");
+        iconContainer.className = "w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0";
+        iconContainer.innerHTML = `<i data-lucide="image" class="w-6 h-6 text-gray-400"></i>`;
+
+        const nameInfo = document.createElement("div");
+        nameInfo.className = "w-48 shrink-0 min-w-0";
+        nameInfo.innerHTML = `
+          <p class="text-sm font-bold text-gray-900 truncate">${file.name}</p>
+          <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">${file.type.split('/')[1]} • ${this.formatSize(file.size)}</p>
+        `;
+
+        const formatsContainer = document.createElement("div");
+        formatsContainer.className = "flex-1 flex gap-4 overflow-x-auto py-1 no-scrollbar";
+
+        formats.forEach(format => {
+          const slot = document.createElement("div");
+          slot.id = `result-${index}-${format}`;
+          slot.className = "flex items-center gap-3 bg-gray-50/50 border border-transparent rounded-2xl px-4 py-2 min-w-[140px]";
+          slot.innerHTML = `
+            <div class="text-right">
+              <p class="text-[10px] font-bold text-gray-300">Pending</p>
+              <p class="text-[11px] font-bold text-gray-200">-- KB</p>
+            </div>
+            <div class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center opacity-30">
+               <span class="text-[9px] font-bold text-gray-400">${format.toUpperCase()}</span>
+            </div>
+          `;
+          formatsContainer.appendChild(slot);
+        });
+
+        row.appendChild(iconContainer);
+        row.appendChild(nameInfo);
+        row.appendChild(formatsContainer);
+        return row;
+      }
+
+      updateCompressButton() {
+        if (this.isConverting) return;
+
+        const btn = document.getElementById("compressBtn");
+        const txt = document.getElementById("compressText");
+
+        if (this.files.length === 0) {
+          btn.disabled = true;
+          txt.textContent = "Select images to continue";
+          return;
+        }
+
+        const formats = this.getFormats();
+        if (formats.length === 0) {
+          btn.disabled = true;
+          txt.textContent = "Select format to continue";
+          this.updateFileDisplay();
+          return;
+        }
+
+        btn.disabled = false;
+        txt.textContent = `Optimize ${this.files.length} file${this.files.length > 1 ? 's' : ''}`;
+        this.updateFileDisplay();
+      }
+
+      getFormats() {
+        const f = [];
+        document.querySelectorAll(".format-pill.active").forEach(pill => {
+          f.push(pill.dataset.format);
+        });
+        return f;
+      }
+
+      async compressImages() {
+        if (this.isConverting) return;
+        this.isConverting = true;
+
+        const btn = document.getElementById("compressBtn");
+        const txt = document.getElementById("compressText");
+        const loading = document.getElementById("compressLoading");
+        const summaryBar = document.getElementById("summaryBar");
+        const summaryTitle = document.getElementById("summaryTitle");
+        const summaryStats = document.getElementById("summaryStats");
+
+        btn.disabled = true;
+        txt.textContent = "Converting...";
+        loading.classList.remove("hidden");
+
+        summaryTitle.textContent = "Converting your images...";
+        summaryTitle.classList.add("animate-pulse");
+
+        const formats = this.getFormats();
+        const quality = parseInt(document.getElementById("qualitySlider").value);
+
+        let totalOriginal = 0;
+        let totalCompressed = 0;
+
+        for (let i = 0; i < this.files.length; i++) {
+          totalOriginal += this.files[i].size;
+          for (let j = 0; j < formats.length; j++) {
+            const result = await this.processFile(this.files[i], formats[j], { quality });
+            this.processedResults.push(result);
+            totalCompressed += result.blob.size;
+            this.updateFormatSlot(i, result);
+            this.addToHistory(result);
+          }
+        }
+
+        const totalSavings = ((1 - totalCompressed / (totalOriginal * formats.length)) * 100).toFixed(0);
+        summaryTitle.textContent = `Panda George converted your images and saved you ${totalSavings}%`;
+        summaryTitle.classList.remove("animate-pulse");
+        summaryStats.textContent = `${this.files.length} images optimized | ${this.formatSize(totalCompressed)} TOTAL`;
+
+        txt.textContent = "Done!";
+        loading.classList.add("hidden");
+        this.isConverting = false;
+        setTimeout(() => this.updateCompressButton(), 2000);
+      }
+
+      processFile(file, format, options) {
+        return new Promise(resolve => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const img = new Image();
+          img.onload = () => {
+            canvas.width = img.width; canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const mime = this.getMime(format);
+            const q = options.quality / 100;
+            canvas.toBlob(blob => {
+              const compressedSize = blob.size;
+              const savings = ((1 - compressedSize / file.size) * 100).toFixed(1);
+              resolve({ originalFile: file, format, blob, originalSize: file.size, compressedSize, savings, filename: this.getName(file.name, format) });
+            }, mime, q);
+          };
+          const reader = new FileReader();
+          reader.onload = e => img.src = e.target.result;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      getMime(f) { return { webp: "image/webp", avif: "image/avif", jpeg: "image/jpeg", png: "image/png" }[f] || "image/jpeg"; }
+      getName(name, f) { return name.replace(/\.[^/.]+$/, "") + "." + f; }
+      formatSize(b) { if (b === 0) return "0 B"; const k = 1024; const s = ["B", "KB", "MB"]; const i = Math.floor(Math.log(b) / Math.log(k)); return (b / Math.pow(k, i)).toFixed(1) + " " + s[i]; }
+
+      updateFormatSlot(i, res) {
+        const slot = document.getElementById(`result-${i}-${res.format}`);
+        if (!slot) return;
+
+        const colors = {
+          webp: "bg-blue-50 text-blue-500",
+          avif: "bg-purple-50 text-purple-500",
+          jpeg: "bg-blue-600 text-white",
+          png: "bg-orange-50 text-orange-500"
         };
-        const reader=new FileReader();
-        reader.onload=e=>img.src=e.target.result;
-        reader.readAsDataURL(file);
-      });
+        const colorClass = colors[res.format] || "bg-gray-100 text-gray-500";
+
+        slot.className = "flex items-center gap-3 bg-white border border-gray-100 rounded-2xl px-4 py-2 min-w-[140px] cursor-pointer hover:border-blue-200 transition-all group";
+        slot.innerHTML = `
+          <div class="text-right">
+            <p class="text-[10px] font-bold text-emerald-500 flex items-center justify-end gap-1">
+              <i data-lucide="check-circle-2" class="w-2.5 h-2.5"></i>
+              -${res.savings}%
+            </p>
+            <p class="text-[11px] font-bold text-gray-900">${this.formatSize(res.compressedSize)}</p>
+          </div>
+          <div class="${colorClass} w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-transform group-active:scale-95">
+             <div class="flex flex-col items-center">
+                <i data-lucide="download" class="w-3.5 h-3.5 mb-0.5"></i>
+                <span class="text-[8px] font-black uppercase">${res.format}</span>
+             </div>
+          </div>
+        `;
+        slot.onclick = () => this.downloadFile(res.filename, res.blob);
+        lucide.createIcons();
+      }
+
+      addToHistory(res) {
+        const historyList = document.getElementById("historyList");
+        const emptyState = historyList.querySelector(".empty-state");
+        if (emptyState) emptyState.remove();
+
+        const item = document.createElement("div");
+        item.className = "flex items-center gap-4 group cursor-pointer p-1 rounded-2xl hover:bg-gray-50 transition-all";
+
+        const formatColors = {
+          webp: "bg-blue-50 text-blue-500",
+          avif: "bg-purple-50 text-purple-500",
+          jpeg: "bg-blue-600 text-white", // In reference blue is used for JPG
+          png: "bg-orange-50 text-orange-500"
+        };
+        const colorClass = formatColors[res.format] || "bg-gray-50 text-gray-400";
+
+        item.innerHTML = `
+          <div class="${colorClass} w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+             <i data-lucide="image" class="w-5 h-5"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+             <p class="text-[13px] font-bold text-gray-900 truncate">${res.filename}</p>
+             <p class="text-[11px] text-gray-400 font-bold mt-0.5">${this.formatSize(res.compressedSize)}</p>
+          </div>
+          <button class="text-gray-300 group-hover:text-gray-900 p-2" onclick="optimizer.downloadFile('${res.filename}', null, true)"><i data-lucide="more-vertical" class="w-5 h-5"></i></button>
+       `;
+        historyList.prepend(item);
+        lucide.createIcons();
+      }
+
+      downloadFile(name, blob, fromHistory = false) {
+        let targetBlob = blob;
+        if (fromHistory) {
+          const result = this.processedResults.find(r => r.filename === name);
+          if (!result) return;
+          targetBlob = result.blob;
+        }
+        const url = URL.createObjectURL(targetBlob);
+        const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      }
+
+      async downloadAllAsZip() {
+        const zip = new JSZip();
+        this.processedResults.forEach(r => zip.file(r.filename, r.blob));
+        const content = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(content);
+        const a = document.createElement("a"); a.href = url; a.download = `swib-batch-${Date.now()}.zip`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      }
     }
 
-    getMime(f){return {webp:"image/webp",avif:"image/avif",jpeg:"image/jpeg",png:"image/png"}[f]||"image/jpeg";}
-    getName(name,f){return name.replace(/\.[^/.]+$/,"")+"."+f;}
-    formatSize(b){if(b===0)return"0 B";const k=1024;const s=["B","KB","MB"];const i=Math.floor(Math.log(b)/Math.log(k));return (b/Math.pow(k,i)).toFixed(1)+" "+s[i];}
-
-    addVersion(i,res){
-      const div=document.createElement("div");
-      div.className="flex justify-between items-center text-sm bg-gray-50 p-2 rounded";
-      div.innerHTML=`<span class="font-medium">${res.format.toUpperCase()}</span><span>${this.formatSize(res.compressedSize)} (−${res.savings}%)</span><button class="hs-btn hs-btn-soft-primary text-xs" onclick="optimizer.downloadFile('${res.filename}',${this.processedResults.length-1})">Download</button>`;
-      document.getElementById(`versions-${i}`).appendChild(div);
-    }
-
-    downloadFile(name,idx){
-      const r=this.processedResults[idx];const url=URL.createObjectURL(r.blob);
-      const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-    }
-
-    async downloadAllAsZip(){
-      const zip=new JSZip();this.processedResults.forEach(r=>zip.file(r.filename,r.blob));
-      const content=await zip.generateAsync({type:"blob"});
-      const url=URL.createObjectURL(content);
-      const a=document.createElement("a");a.href=url;a.download=`compressed-images-${Date.now()}.zip`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-    }
-
-    updateStats(){
-      const sec=document.getElementById("statsSection");
-      if(this.processedResults.length===0){sec.classList.add("hidden");return;}
-      sec.classList.remove("hidden");
-      const totalOrig=this.processedResults.reduce((s,r)=>s+r.originalSize,0);
-      const totalComp=this.processedResults.reduce((s,r)=>s+r.compressedSize,0);
-      const totalSav=((1-totalComp/totalOrig)*100).toFixed(1);
-      document.getElementById("totalFiles").textContent=this.files.length;
-      document.getElementById("originalSize").textContent=this.formatSize(totalOrig);
-      document.getElementById("compressedSize").textContent=this.formatSize(totalComp);
-      document.getElementById("totalSavings").textContent=totalSav+"%";
-    }
-  }
-
-  const optimizer=new ImageOptimizer();
+    const optimizer = new ImageOptimizer();
   </script>
 </body>
+
 </html>
